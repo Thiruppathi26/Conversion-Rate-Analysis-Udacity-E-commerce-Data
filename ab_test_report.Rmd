@@ -1,0 +1,91 @@
+---
+title: "Conversion Rate Optimization with A/B Testing: A Case Study on Udacity E-commerce Data"
+author: "Thiruppathi"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# Introduction
+
+This project analyzes an A/B test for an e-commerce website.  
+The goal is to determine whether **Control** has a higher conversion rate than **Treatment**.  
+
+We use:
+- **Conversion Rate** calculation  
+- **Proportion Test** for hypothesis testing  
+- **Visualization** to compare groups  
+
+---
+
+#Load and Explore the Dataset
+```{r}
+library(dplyr)
+library(ggplot2)
+Data<-read.csv("C:/Users/thiru/OneDrive/Desktop/AB_Test/ab_data.csv")
+head(Data)
+str(Data)
+table(Data$group)
+table(Data$landing_page)
+```
+
+#Summary of the Dataset
+```{r}
+Summary_Data<-Data %>% 
+  group_by(group) %>% 
+  summarise(Conversions=sum(converted),Visitors=n())
+Summary_Data
+```
+
+#Conversion Rate of each group
+```{r}
+Conversion_Rate<-Data %>% 
+  group_by(group) %>%
+  summarise(
+    Visitors=n(),
+    Conversion=sum(converted),
+    Conversion_Rate=(Conversion/Visitors)*100
+  )
+Conversion_Rate
+```
+
+#Proportion Test
+```{r}
+prop.test(x=Summary_Data$Conversions,n=Summary_Data$Visitors)
+```
+
+#Finding the Conversion Lift
+```{r}
+CR_Control<-Summary_Data$Conversions[Summary_Data$group=="control"]/
+  Summary_Data$Visitors[Summary_Data$group=="control"]
+CR_Treatment<-Summary_Data$Conversions[Summary_Data$group=="treatment"]/
+  Summary_Data$Visitors[Summary_Data$group=="treatment"]
+
+lift<-(CR_Treatment - CR_Control)/CR_Control *100
+lift
+```
+
+#Visualize the result through Bar Chart
+```{r}
+ggplot(Conversion_Rate,aes(x=group,y=Conversion_Rate,fill = group))+
+  geom_col(width=0.6) +
+  geom_text(aes(label = paste0(round(Conversion_Rate,2),"%")),vjust=-0.5,size=3)+
+  scale_y_continuous(labels = scales::percent_format())+
+  labs(title="Conversion Rate by Group", y="Conversion Rate") +
+  theme_bw()
+```
+
+#Results
+
+Conversion Rate (control):  12.0 %
+
+Conversion Rate (Treatment):  11.9 %
+
+p-value from prop.test: 0.2182
+
+#Conclusion
+
+If p-value < 0.05, we reject H₀ and conclude that the difference in conversion rates is statistically significant.
+
+In this test, Group **Control** shows higher conversion rates, and the improvement is not due to random chance.
+
+**Control**  can be considered the better design for improving conversions.
