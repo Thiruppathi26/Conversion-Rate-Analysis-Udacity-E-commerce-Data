@@ -43,6 +43,8 @@ ggplot2 – Visualization
 stats – Hypothesis testing
 
 # 📈 Results & Insights
+<img width="862" height="552" alt="image" src="https://github.com/user-attachments/assets/62ac3b2b-c9ef-42fe-88dd-fb8546e075fd" />
+
 
 Conversion Rate (Control): 12.0%
 
